@@ -70,6 +70,7 @@ class PlasmaFluxCatalyst(key: String, settings: JSONObject) : Exotic(key, settin
         mods: ShipModifications,
         exoticData: ExoticData
     ) {
+        if (member.fleetData == null) return //Crash Fix
         if (FleetMemberUtils.getFleetCommander(member) == null) {
             return
         }
