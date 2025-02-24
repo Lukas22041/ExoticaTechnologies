@@ -1,7 +1,5 @@
 package exoticatechnologies.modifications.exotics.impl
 
-import activators.ActivatorManager
-import activators.CombatActivator
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.MutableShipStatsAPI
 import com.fs.starfarer.api.combat.MutableStat
@@ -16,6 +14,8 @@ import exoticatechnologies.modifications.exotics.Exotic
 import exoticatechnologies.modifications.exotics.ExoticData
 import exoticatechnologies.util.StringUtils
 import org.json.JSONObject
+import org.magiclib.subsystems.MagicSubsystem
+import org.magiclib.subsystems.MagicSubsystemsManager
 import java.awt.Color
 import kotlin.math.abs
 
@@ -67,9 +67,9 @@ class FullMetalSalvo(key: String, settings: JSONObject) : Exotic(key, settings) 
         mods: ShipModifications,
         exoticData: ExoticData
     ) {
-        if (ActivatorManager.getActivators(ship)?.filterIsInstance<SalvoActivator>()?.isEmpty() != false) {
+        if (MagicSubsystemsManager.getSubsystemsForShipCopy(ship)?.filterIsInstance<SalvoActivator>()?.isEmpty() != false) {
             val activator = SalvoActivator(ship, member, mods, exoticData)
-            ActivatorManager.addActivator(ship, activator)
+            MagicSubsystemsManager.addSubsystemToShip(ship, activator)
         }
     }
 
@@ -79,7 +79,7 @@ class FullMetalSalvo(key: String, settings: JSONObject) : Exotic(key, settings) 
         val mods: ShipModifications,
         val exoticData: ExoticData
     ) :
-        CombatActivator(ship) {
+        MagicSubsystem(ship) {
         override fun getDisplayText(): String {
             return Global.getSettings().getString(exoticData.key, "systemText")
         }
@@ -92,7 +92,7 @@ class FullMetalSalvo(key: String, settings: JSONObject) : Exotic(key, settings) 
             return COOLDOWN.toFloat()
         }
 
-        override fun advance(amount: Float) {
+        override fun advance(amount: Float, isPaused: Boolean) {
             if (state == State.ACTIVE) {
                 gigaProjectiles(ship)
             }

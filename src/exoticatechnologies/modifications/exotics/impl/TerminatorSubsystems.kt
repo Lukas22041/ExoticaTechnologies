@@ -1,7 +1,5 @@
 package exoticatechnologies.modifications.exotics.impl
 
-import activators.ActivatorManager
-import activators.drones.DroneActivator
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.combat.*
 import com.fs.starfarer.api.combat.ShipAPI.HullSize
@@ -22,6 +20,9 @@ import exoticatechnologies.util.StringUtils
 import org.json.JSONObject
 import org.lwjgl.util.vector.Vector2f
 import org.magiclib.kotlin.getDistanceSq
+import org.magiclib.subsystems.MagicSubsystem
+import org.magiclib.subsystems.MagicSubsystemsManager
+import org.magiclib.subsystems.drones.MagicDroneSubsystem
 import java.awt.Color
 import java.util.*
 import kotlin.math.abs
@@ -52,7 +53,7 @@ class TerminatorSubsystems(key: String, settings: JSONObject) : Exotic(key, sett
         mods: ShipModifications,
         exoticData: ExoticData
     ) {
-        ActivatorManager.addActivator(ship, TerminatorDroneActivator(ship))
+        MagicSubsystemsManager.addSubsystemToShip(ship, TerminatorDroneActivator(ship))
     }
 
     override fun canUseExoticType(type: ExoticType): Boolean {
@@ -63,7 +64,7 @@ class TerminatorSubsystems(key: String, settings: JSONObject) : Exotic(key, sett
         return false
     }
 
-    class TerminatorDroneActivator(ship: ShipAPI) : DroneActivator(ship) {
+    class TerminatorDroneActivator(ship: ShipAPI) : MagicDroneSubsystem(ship) {
         private val droneStrikeStats = DroneStrikeStats()
         private var weaponBackingField: WeaponAPI? = null
         private val weapon: WeaponAPI

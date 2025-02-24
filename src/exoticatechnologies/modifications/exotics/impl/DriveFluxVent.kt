@@ -1,7 +1,5 @@
 package exoticatechnologies.modifications.exotics.impl
 
-import activators.ActivatorManager
-import activators.CombatActivator
 import com.fs.starfarer.api.Global
 import com.fs.starfarer.api.campaign.CampaignFleetAPI
 import com.fs.starfarer.api.campaign.econ.MarketAPI
@@ -21,6 +19,8 @@ import org.json.JSONObject
 import org.lazywizard.lazylib.MathUtils
 import org.lazywizard.lazylib.VectorUtils
 import org.lwjgl.util.vector.Vector2f
+import org.magiclib.subsystems.MagicSubsystem
+import org.magiclib.subsystems.MagicSubsystemsManager
 import java.awt.Color
 import kotlin.math.abs
 import kotlin.math.absoluteValue
@@ -73,7 +73,7 @@ class DriveFluxVent(key: String, settings: JSONObject) : Exotic(key, settings) {
         mods: ShipModifications,
         exoticData: ExoticData
     ) {
-        ActivatorManager.addActivator(ship, BigVentActivator(ship, member, mods, exoticData))
+        MagicSubsystemsManager.addSubsystemToShip(ship, BigVentActivator(ship, member, mods, exoticData))
     }
 
     fun getSystemCooldown(member: FleetMemberAPI, mods: ShipModifications, exoticData: ExoticData): Float {
@@ -88,7 +88,7 @@ class DriveFluxVent(key: String, settings: JSONObject) : Exotic(key, settings) {
         return DAMAGE_TAKEN_INCREASE * getNegativeMult(member, mods, exoticData)
     }
 
-    inner class BigVentActivator(ship: ShipAPI, val member: FleetMemberAPI, val mods: ShipModifications, val exoticData: ExoticData): CombatActivator(ship) {
+    inner class BigVentActivator(ship: ShipAPI, val member: FleetMemberAPI, val mods: ShipModifications, val exoticData: ExoticData): MagicSubsystem(ship) {
         private var lastActivation: Float = -1f
 
         override fun canActivate(): Boolean {
@@ -280,7 +280,7 @@ class DriveFluxVent(key: String, settings: JSONObject) : Exotic(key, settings) {
             stats.armorDamageTakenMult.modifyPercent(buffId, getDamageTakenIncrease(member, mods, exoticData))
         }
 
-        override fun advance(amount: Float) {
+        override fun advance(amount: Float, isPaused: Boolean) {
             if (state == State.IN || state == State.ACTIVE || state == State.OUT) {
                 ship.engineController.fadeToOtherColor(this, engineColor, Color(0, 0, 0, 0), effectLevel, 0.67f)
                 ship.engineController.extendFlame(this, 2f * effectLevel, 0f * effectLevel, 0f * effectLevel)
